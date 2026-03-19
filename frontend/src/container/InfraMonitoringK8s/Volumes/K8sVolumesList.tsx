@@ -42,6 +42,8 @@ import {
 	formatDataForTable,
 	getK8sVolumesListColumns,
 	getK8sVolumesListQuery,
+	getVolumeListGroupedByRowDataQueryKey,
+	getVolumesListQueryKey,
 	K8sVolumesRowData,
 } from './utils';
 import VolumeDetails from './VolumeDetails';
@@ -194,6 +196,26 @@ function K8sVolumesList({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [minTime, maxTime, orderBy, selectedRowData, groupBy]);
 
+	const groupedByRowDataQueryKey = useMemo(
+		() =>
+			getVolumeListGroupedByRowDataQueryKey(
+				selectedRowData?.groupedByMeta,
+				queryFilters,
+				orderBy,
+				groupBy,
+				minTime,
+				maxTime,
+			),
+		[
+			selectedRowData?.groupedByMeta,
+			queryFilters,
+			orderBy,
+			groupBy,
+			minTime,
+			maxTime,
+		],
+	);
+
 	const {
 		data: groupedByRowData,
 		isFetching: isFetchingGroupedByRowData,
@@ -203,7 +225,7 @@ function K8sVolumesList({
 	} = useGetK8sVolumesList(
 		fetchGroupedByRowDataQuery as K8sVolumesListPayload,
 		{
-			queryKey: ['volumeList', fetchGroupedByRowDataQuery],
+			queryKey: groupedByRowDataQueryKey,
 			enabled: !!fetchGroupedByRowDataQuery && !!selectedRowData,
 		},
 		undefined,
@@ -248,6 +270,28 @@ function K8sVolumesList({
 		return queryPayload;
 	}, [pageSize, currentPage, queryFilters, minTime, maxTime, orderBy, groupBy]);
 
+	const volumesListQueryKey = useMemo(() => {
+		return getVolumesListQueryKey(
+			selectedVolumeUID,
+			pageSize,
+			currentPage,
+			queryFilters,
+			orderBy,
+			groupBy,
+			minTime,
+			maxTime,
+		);
+	}, [
+		selectedVolumeUID,
+		pageSize,
+		currentPage,
+		queryFilters,
+		groupBy,
+		orderBy,
+		minTime,
+		maxTime,
+	]);
+
 	const formattedGroupedByVolumesData = useMemo(
 		() =>
 			formatDataForTable(groupedByRowData?.payload?.data?.records || [], groupBy),
@@ -264,7 +308,7 @@ function K8sVolumesList({
 	const { data, isFetching, isLoading, isError } = useGetK8sVolumesList(
 		query as K8sVolumesListPayload,
 		{
-			queryKey: ['volumeList', query],
+			queryKey: volumesListQueryKey,
 			enabled: !!query,
 		},
 		undefined,
