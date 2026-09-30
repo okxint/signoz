@@ -135,6 +135,7 @@ func (store *store) ListUsersByOrgID(ctx context.Context, orgID valuer.UUID) ([]
 		NewSelect().
 		Model(&users).
 		Where("org_id = ?", orgID).
+		Where("status != ?", types.UserStatusDeleted).
 		Scan(ctx)
 	if err != nil {
 		return nil, err
