@@ -48,7 +48,7 @@ const useQueryPagination = (
 		redirectWithCurrentPagination({
 			...paginationQueryData,
 			offset:
-				paginationQueryData.limit === totalCount
+				totalCount >= paginationQueryData.limit
 					? paginationQueryData.offset + paginationQueryData.limit
 					: paginationQueryData.offset,
 		});
